@@ -1,10 +1,11 @@
 #!/bin/bash
 
 FECHA_EJECUCION=`date +%Y%m%d-%s`
+PATH_GOAV=/home/admin
 PATH_FICHEROS=/tmp/secproxy/files
-PATH_LOGS=/home/mobaxterm/tmp/secproxy/logs
-PATH_PAQUETES=/home/mobaxterm/tmp/secproxy/paquetes
-LOGFILE=$PATH_logs/$FECHA_EJECUCION.log
+PATH_LOGS=/tmp/secproxy/logs
+PATH_PAQUETES=/tmp/secproxy/paquetes
+LOGFILE=$PATH_LOGS/$FECHA_EJECUCION.log
 
 HOTFIX=`ls -ltr $PATH_PAQUETES/AvPlatform* |  awk '//{print $9}' |tail -n 1`
 ROLLUP=`ls -ltr $PATH_PAQUETES/*OsRollup* |  awk '//{print $9}' |tail -n 1`
@@ -13,10 +14,16 @@ echo "Total parametro=" $# >> $LOGFILE
 echo $* >> $LOGFILE
 
 
+funcion_password_goav()
+{
+$PATH_GOAV/goav proxy disks --name $i -n
+}
+
+
 funcion_backupfiles()
 {
   #$PATH_GOAV/goav proxy upload --local $PATH_SECURIZACION/backup_files.sh --remote /tmp/backup_files.sh -n
-  #$PATH_GOAV/goav proxy exec "chmod 744 /tmp/backup_files.sh" -n
+  #$PATH_GOAV/oav proxy exec "chmod 744 /tmp/backup_files.sh" -n
   #$PATH_GOAV/goav proxy exec "/tmp/backup_files.sh" -n
   echo "    $i: Haciendo copia de seguridad de ficheros de configuración" >> $LOGFILE
 }
@@ -50,26 +57,36 @@ funcion_passwords()
 
 
 if [ $# -gt 0 ]; then
-  NUMPROXIES=$((`wc -l proxy_show.txt | awk '//{print $1}'` -2))
+  $PATH_GOAV/goav proxy show -n > show_proxies.txt
+  NUMPROXIES=$((`wc -l show_proxies.txt | awk '//{print $1}'` -2))
   echo "NUMERO DE PROXIES:" $NUMPROXIES >> $LOGFILE
-  tail -n $NUMPROXIES proxy_show.txt > list_proxies.txt
+  tail -n $NUMPROXIES show_proxies.txt > list_proxies.txt
   for i in "$@"
     do
       if grep "$i" list_proxies.txt > /dev/null
+        PROXIES=$i,$PROXIES
         then
-          echo "SECURIZANDO" $i >> $LOGFILE
-	  funcion_backupfiles
-	  funcion_hardening_sh
-	  funcion_passwords
+          echo $i "existe"  >> $LOGFILE
+#	  funcion_backupfiles
+#	  funcion_hardening_sh
+#	  funcion_passwords
+#          funcion_password_goav
         else
           echo $i "no encontrado" >> $LOGFILE
           echo "NO TODOS LOS PROXIES DEL LISTADO EXISTEN" >> $LOGFILE
+          exit
       fi
     done
 else
   echo "sin parametros" >> $LOGFILE
   exit
 fi
+
+
+echo $PROXIES
+funcion_password_goav
+
+
 
 echo "fin" >> $LOGFILE
 
