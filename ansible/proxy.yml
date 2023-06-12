@@ -1,1 +1,14 @@
 ---
+
+- name: Securización de Proxies
+  hosts: PROXIES
+  gather_facts: false
+
+  tasks:
+
+    - name: prueba
+      command: ls 
+      register: prueba
+      #become: yes
+
+    - debug: var=prueba
