@@ -6,9 +6,20 @@
 
   tasks:
 
-    - name: prueba
-      command: ls 
-      register: prueba
-      #become: yes
+    - name: copiar imagen de Rollup
 
-    - debug: var=prueba
+    - name: Crear directorio /mnt/ossu
+
+    - name: Montar .iso en /mnt/ossu
+
+    - name: Parar servicio avagent
+
+    - name: Crear directorio /tmp/patch
+
+    - name: crear link
+
+    - name: copiar sec_install_os_errata_sles.pl a "tmp/patch"
+
+    - name: Lanzar instalador
+
+

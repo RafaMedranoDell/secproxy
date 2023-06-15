@@ -1,0 +1,45 @@
+
+@ddve = ddve-02
+@ddveUser = sysadmin
+@ddvePass = Password123!
+@secofficer = c2VjdXNlcmRkcjpEZWxsLkVNQy4xMjM0NTY3
+
+
+# @name ask_token
+
+POST https://{{ddve}}:3009/rest/v1.0/auth
+Content-Type: application/json
+
+{
+    "username": "{{ddveUser}}",
+    "password": "{{ddvePass}}"
+}
+
+###
+@token = {{ask_token.response.headers.X-DD-AUTH-TOKEN}}
+GET https://{{ddve}}:3009/rest/v1.0/dd-systems/0/alerts
+X-DD-AUTH-TOKEN: {{token}}
+Content-Type: application/json
+
+
+###
+@token = {{ask_token.response.headers.X-DD-AUTH-TOKEN}}
+GET https://{{ddve}}:3009/rest/v1.0/dd-systems/0/file-systems/encryptions
+X-DD-AUTH-TOKEN: {{token}}
+Content-Type: application/json
+
+###
+GET https://{{ddve}}:3009/rest/v1.0/dd-systems/0/file-systems/encryptions/keys/
+X-DD-AUTH-TOKEN: {{token}}
+Content-Type: application/json
+
+###
+GET https://{{ddve}}:3009/rest/v1.0/dd-systems/0/file-systems/encryptions/key-managers
+X-DD-AUTH-TOKEN: {{token}}
+Content-Type: application/json
+
+###
+PUT https://{{ddve}}:3009/rest/v1.0/dd-systems/0/file-systems/encryptions/keys/
+X-DD-AUTH-TOKEN: {{token}}
+#X-DD-SEC-OFFICER: {{secofficer}}
+Content-Type: application/json
